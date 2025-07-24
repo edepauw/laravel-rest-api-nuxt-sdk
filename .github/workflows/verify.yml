@@ -16,6 +16,8 @@ jobs:
         with:
           node-version: '18'
 
+      - run: rm -rf package-lock.json
+
       - run: npm ci --legacy-peer-deps
 
       - run: npm run test
