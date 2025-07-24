@@ -3,7 +3,7 @@ name: Verify before merge
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   verify:
