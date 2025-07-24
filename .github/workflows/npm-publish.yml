@@ -1,33 +1,63 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Node.js Package
+name: Publish to npm
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm test
 
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+          fetch-depth: 2  # nécessaire pour le diff avec HEAD^
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ✅ Vérifie si "version" a été modifié dans le dernier commit
+      - name: Check if version was updated manually
+        id: version-check
+        run: |
+          VERSION_CHANGED=$(git diff HEAD^ HEAD -- package.json | grep '"version":' || true)
+          if [ -z "$VERSION_CHANGED" ]; then
+            echo "version_updated=false" >> $GITHUB_OUTPUT
+          else
+            echo "version_updated=true" >> $GITHUB_OUTPUT
+          fi
+
+      # ✅ Log visuel pour mieux suivre
+      - name: Log version check result
+        run: |
+          if [ "${{ steps.version-check.outputs.version_updated }}" = "true" ]; then
+            echo "✅ Version already updated manually."
+          else
+            echo "🔧 Auto-bumping version (patch)..."
+          fi
+
+      # ✅ Bump version automatiquement si nécessaire
+      - name: Bump version (only if not updated manually)
+        if: steps.version-check.outputs.version_updated == 'false'
+        run: npm version patch --no-git-tag-version
+
+      # 🔨 Build + test (tu peux ajuster ici)
+      - name: Run tests
+        run: npm run test
+
+      - name: Build
+        run: npm run prepack
+
+      # 🚀 Publication sur npm
+      - name: Publish to npm
+        run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
