@@ -49,6 +49,16 @@ jobs:
         if: steps.version-check.outputs.version_updated == 'false'
         run: npm version patch --no-git-tag-version
 
+      - name: Commit version bump
+        if: steps.version-check.outputs.version_updated == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "ci: bump version after publish"
+          git push origin main
+
+
       # 🔨 Build + test (tu peux ajuster ici)
       - name: Run tests
         run: npm run test
