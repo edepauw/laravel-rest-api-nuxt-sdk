@@ -18,8 +18,6 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
-      - run: rm -rf node_modules/@rollup/rollup-linux-x64-gnu || true
-
       - run: npm run test
 
       - run: npm run prepack
