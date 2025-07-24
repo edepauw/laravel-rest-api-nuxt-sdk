@@ -16,7 +16,10 @@ jobs:
         with:
           node-version: '18'
 
-      - run: npm i --legacy-peer-deps
+      - run: npm ci --legacy-peer-deps
+
+      - name: Remove problematic rollup optional deps
+      - run: rm -rf node_modules/@rollup/rollup-linux-x64-gnu || true
 
       - run: npm run test
 
