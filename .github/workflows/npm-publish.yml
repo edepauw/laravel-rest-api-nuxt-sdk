@@ -13,51 +13,50 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2  # nécessaire pour le diff avec HEAD^
+          fetch-depth: 2 # nécessaire pour le diff avec HEAD^
 
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org/'
+          node-version: "18"
+          registry-url: "https://registry.npmjs.org/"
 
       - name: Install dependencies
         run: npm ci
 
-      # ✅ Vérifie si "version" a été modifié dans le dernier commit
-      - name: Check if version was updated manually
-        id: version-check
-        run: |
-          VERSION_CHANGED=$(git diff HEAD^ HEAD -- package.json | grep '"version":' || true)
-          if [ -z "$VERSION_CHANGED" ]; then
-            echo "version_updated=false" >> $GITHUB_OUTPUT
-          else
-            echo "version_updated=true" >> $GITHUB_OUTPUT
-          fi
+      # # ✅ Vérifie si "version" a été modifié dans le dernier commit
+      # - name: Check if version was updated manually
+      #   id: version-check
+      #   run: |
+      #     VERSION_CHANGED=$(git diff HEAD^ HEAD -- package.json | grep '"version":' || true)
+      #     if [ -z "$VERSION_CHANGED" ]; then
+      #       echo "version_updated=false" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "version_updated=true" >> $GITHUB_OUTPUT
+      #     fi
 
-      # ✅ Log visuel pour mieux suivre
-      - name: Log version check result
-        run: |
-          if [ "${{ steps.version-check.outputs.version_updated }}" = "true" ]; then
-            echo "✅ Version already updated manually."
-          else
-            echo "🔧 Auto-bumping version (patch)..."
-          fi
+      # # ✅ Log visuel pour mieux suivre
+      # - name: Log version check result
+      #   run: |
+      #     if [ "${{ steps.version-check.outputs.version_updated }}" = "true" ]; then
+      #       echo "✅ Version already updated manually."
+      #     else
+      #       echo "🔧 Auto-bumping version (patch)..."
+      #     fi
 
-      # ✅ Bump version automatiquement si nécessaire
-      - name: Bump version (only if not updated manually)
-        if: steps.version-check.outputs.version_updated == 'false'
-        run: npm version patch --no-git-tag-version
+      # # ✅ Bump version automatiquement si nécessaire
+      # - name: Bump version (only if not updated manually)
+      #   if: steps.version-check.outputs.version_updated == 'false'
+      #   run: npm version patch --no-git-tag-version
 
-      - name: Commit version bump
-        if: steps.version-check.outputs.version_updated == 'false'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
-          git commit -m "ci: bump version after publish"
-          git push -f origin master
-
+      # - name: Commit version bump
+      #   if: steps.version-check.outputs.version_updated == 'false'
+      #   run: |
+      #     git config user.name "github-actions[bot]"
+      #     git config user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add package.json package-lock.json
+      #     git commit -m "ci: bump version after publish"
+      #     git push -f origin master
 
       # 🔨 Build + test (tu peux ajuster ici)
       - name: Run tests
