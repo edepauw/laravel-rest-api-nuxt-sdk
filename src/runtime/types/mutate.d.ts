@@ -11,7 +11,7 @@ interface IMutateRelationRequest {
 
 interface IMutateRequest<T> {
   operation: "create" | "update";
-  attributes?: T;
+  attributes?: Partial<T>;
   key?: number | string;
   without_detaching?: boolean;
   relations?: {
