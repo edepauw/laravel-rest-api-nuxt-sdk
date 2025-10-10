@@ -1,3 +1,5 @@
+type operatorType = "=" | "!=" | ">" | "<" | ">=" | "<=" | "like" | "not like" | "in" | "not in";
+
 interface ISearchQuery<T> {
   text?: IText;
   scopes?: IScopes[];
@@ -15,6 +17,7 @@ interface ISearchQuery<T> {
 
 interface IText {
   value: string;
+  trashed?: "with" | "only" | "omitted"
 }
 
 interface IScopes {
@@ -24,18 +27,8 @@ interface IScopes {
 
 interface IFilter<T> {
   field?: string;
-  operator?:
-  | "="
-  | "!="
-  | ">"
-  | "<"
-  | ">="
-  | "<="
-  | "like"
-  | "not like"
-  | "in"
-  | "not in";
-  value?: string | number | boolean;
+  operator?: operatorType;
+  value?: any;
   type?: "and" | "or";
   nested?: IFilter<T>[];
 }
@@ -103,6 +96,7 @@ interface ISearchResponse<T> {
 }
 
 export type {
+  operatorType,
   ISearchQuery,
   ISearchResponse,
   IText,
