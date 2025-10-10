@@ -1,6 +1,6 @@
 {
   "name": "laravel-rest-api-nuxt-sdk",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "SDK for easily consuming lomkit/laravel-rest-api endpoints in Nuxt.js applications. Provides a typed, intuitive interface for handling resources.",
   "license": "MIT",
   "type": "module",
@@ -15,6 +15,14 @@
     },
     "./types/*": {
       "types": "./dist/runtime/types/*.d.ts"
+    },
+    "./queryBuilders/*": {
+      "types": "./dist/runtime/queryBuilders/*.d.ts",
+      "import": "./dist/runtime/queryBuilders/*.js"
+    },
+    "./searchClass/*": {
+      "types": "./dist/runtime/queryBuilders/searchClass/*.d.ts",
+      "import": "./dist/runtime/queryBuilders/searchClass/*.js"
     }
   },
   "main": "./dist/module.mjs",
