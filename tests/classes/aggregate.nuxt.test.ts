@@ -23,9 +23,7 @@ describe('AggregateBuilder', () => {
         expect(result).toEqual([
             {
                 relation: 'orders',
-                type: 'count',
-                field: undefined,
-                filters: undefined
+                type: 'count'
             }
         ])
     })
@@ -71,15 +69,12 @@ describe('AggregateBuilder', () => {
         expect(result).toEqual([
             {
                 relation: 'orders',
-                type: 'count',
-                field: undefined,
-                filters: undefined
+                type: 'count'
             },
             {
                 relation: 'products',
                 type: 'sum',
-                field: 'quantity',
-                filters: undefined
+                field: 'quantity'
             }
         ])
     })

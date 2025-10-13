@@ -9,14 +9,14 @@ describe('ScopeBuilder', () => {
 
     it('should add a single scope with only name', () => {
         const builder = new ScopeBuilder()
-        builder.addScope({ name: 'activeUsers' })
+        builder.addScope('activeUsers')
 
         expect(builder.build()).toEqual([{ name: 'activeUsers' }])
     })
 
     it('should add a single scope with name and parameters', () => {
         const builder = new ScopeBuilder()
-        builder.addScope({ name: 'dateRange', parameters: ['2023-01-01', '2023-12-31'] })
+        builder.addScope('dateRange', ['2023-01-01', '2023-12-31'])
 
         expect(builder.build()).toEqual([{ name: 'dateRange', parameters: ['2023-01-01', '2023-12-31'] }])
     })
@@ -24,8 +24,8 @@ describe('ScopeBuilder', () => {
     it('should accumulate multiple scopes', () => {
         const builder = new ScopeBuilder()
         builder
-            .addScope({ name: 'activeUsers' })
-            .addScope({ name: 'premiumUsers', parameters: [true] })
+            .addScope('activeUsers')
+            .addScope('premiumUsers', [true])
 
         expect(builder.build()).toEqual([
             { name: 'activeUsers' },

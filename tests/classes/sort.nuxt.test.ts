@@ -9,14 +9,14 @@ describe('SortBuilder', () => {
 
     it('should add a single sort with asc direction', () => {
         const builder = new SortBuilder()
-        builder.addSort({ field: 'name', direction: 'asc' })
+        builder.addSort('name')
 
-        expect(builder.build()).toEqual([{ field: 'name', direction: 'asc' }])
+        expect(builder.build()).toEqual([{ field: 'name' }])
     })
 
     it('should add a single sort with desc direction', () => {
         const builder = new SortBuilder()
-        builder.addSort({ field: 'date', direction: 'desc' })
+        builder.addSort('date', 'desc')
 
         expect(builder.build()).toEqual([{ field: 'date', direction: 'desc' }])
     })
@@ -24,11 +24,11 @@ describe('SortBuilder', () => {
     it('should accumulate multiple sorts', () => {
         const builder = new SortBuilder()
         builder
-            .addSort({ field: 'name', direction: 'asc' })
-            .addSort({ field: 'date', direction: 'desc' })
+            .addSort('name')
+            .addSort('date', 'desc')
 
         expect(builder.build()).toEqual([
-            { field: 'name', direction: 'asc' },
+            { field: 'name' },
             { field: 'date', direction: 'desc' }
         ])
     })

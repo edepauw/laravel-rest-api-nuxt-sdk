@@ -9,23 +9,23 @@ describe('IInstructionBuilder', () => {
 
     it('should add a single instruction with only name', () => {
         const builder = new IInstructionBuilder()
-        builder.addInstruction({ name: 'resetCache' })
+        builder.addInstruction('resetCache')
 
-        expect(builder.build()).toEqual([{ name: 'resetCache' }])
+        expect(builder.build()).toEqual([ {name: 'resetCache'} ])
     })
 
     it('should add a single instruction with name and fields', () => {
         const builder = new IInstructionBuilder()
-        builder.addInstruction({ name: 'sendEmail', fields: ['to', 'subject'] })
+        builder.addInstruction('sendEmail', ['to', 'subject'])
 
-        expect(builder.build()).toEqual([{ name: 'sendEmail', fields: ['to', 'subject'] }])
+        expect(builder.build()).toEqual([ {name: 'sendEmail', fields: ['to', 'subject']} ])
     })
 
     it('should accumulate multiple instructions', () => {
         const builder = new IInstructionBuilder()
         builder
-            .addInstruction({ name: 'clearLogs' })
-            .addInstruction({ name: 'notifyAdmin', fields: ['level', 'message'] })
+            .addInstruction('clearLogs')
+            .addInstruction('notifyAdmin', ['level', 'message'])
 
         expect(builder.build()).toEqual([
             { name: 'clearLogs' },

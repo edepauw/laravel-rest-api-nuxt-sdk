@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { FilterBuilder } from '../../src/runtime/queryBuilders/searchClass/filter'
-import type { IFilter } from '../../src/runtime/types/search'
 
 type DummyModel = { id: number; status: string }
 
@@ -12,40 +11,39 @@ describe('FilterBuilder', () => {
 
     it('should add a single filter', () => {
         const builder = new FilterBuilder<DummyModel>()
-        builder.addFilter({
-            field: 'status',
-            operator: '=',
-            value: 'active',
-            type: 'and'
-        })
+        builder.addFilter('status', 'active','=', 'and')
 
         expect(builder.build()).toEqual([
             {
                 field: 'status',
                 operator: '=',
                 value: 'active',
-                type: 'and',
-                nested: undefined
+                type: 'and'
             }
         ])
     })
 
     it('should add a single nested filter', () => {
         const builder = new FilterBuilder<DummyModel>()
-        builder.addNestedFilter({
-            field: 'category',
-            operator: '=',
-            value: 'books',
-            type: 'or'
-        })
+        builder.addNestedFilter([
+            {
+                field: 'category',
+                value: 'books',
+                operator: '=',
+                type: 'or'
+            }
+        ])
 
         expect(builder.build()).toEqual([
             {
-                field: 'category',
-                operator: '=',
-                value: 'books',
-                type: 'or',
-                nested: undefined
+                nested: [
+                    {
+                        field: 'category',
+                        value: 'books',
+                        operator: '=',
+                        type: 'or'
+                    }
+                ]
             }
         ])
     })
@@ -53,56 +51,35 @@ describe('FilterBuilder', () => {
     it('should add multiple filters and nested filters', () => {
         const builder = new FilterBuilder<DummyModel>()
         builder
-            .addFilter({
-                field: 'status',
-                operator: '=',
-                value: 'active',
-                type: 'and'
-            })
-            .addNestedFilter({
+            .addFilter('status', 'active')
+            .addFilter('status', 'inactive','=',  'or')
+            .addNestedFilter([{
                 field: 'type',
                 operator: 'in',
                 value: ['free', 'paid'],
                 type: 'or'
-            })
+            }])
 
         expect(builder.build()).toEqual([
             {
                 field: 'status',
-                operator: '=',
-                value: 'active',
-                type: 'and',
-                nested: undefined
+                value: 'active'
             },
             {
-                field: 'type',
-                operator: 'in',
-                value: ['free', 'paid'],
-                type: 'or',
-                nested: undefined
-            }
-        ])
-    })
-
-    it('should add a filter with nested filters inside', () => {
-        const nested: IFilter<DummyModel>[] = [
-            { field: 'status', operator: '=', value: 'pending', type: 'and' },
-            { field: 'priority', operator: '>=', value: 2, type: 'and' }
-        ]
-
-        const builder = new FilterBuilder<DummyModel>()
-        builder.addFilter({
-            type: 'or',
-            nested
-        })
-
-        expect(builder.build()).toEqual([
+                field: 'status',
+                operator: '=',
+                value: 'inactive',
+                type: 'or'
+            },
             {
-                field: undefined,
-                value: undefined,
-                operator: undefined,
-                type: 'or',
-                nested
+                nested: [
+                    {
+                        field: 'type',
+                        operator: 'in',
+                        value: ['free', 'paid'],
+                        type: 'or'
+                    }
+                ]
             }
         ])
     })
