@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import details from '../src/runtime/methods/details'
+import details from '../../src/runtime/methods/details'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch as any

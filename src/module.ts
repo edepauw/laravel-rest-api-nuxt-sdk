@@ -14,6 +14,9 @@ export default defineNuxtModule({
     const resolver = createResolver(import.meta.url);
     addImportsDir(resolver.resolve("./runtime/defineResource"));
     addImportsDir(nuxt.options.srcDir + "/resources");
+    addImportsDir(resolver.resolve("./runtime/queryBuilders"));
+    addImportsDir(resolver.resolve("./runtime/queryBuilders/searchClass"));
+    addImportsDir(resolver.resolve("./runtime/types"));
     addPlugin(resolver.resolve("./runtime/plugin"));
 
     nuxt.hook("prepare:types", (opts) => {

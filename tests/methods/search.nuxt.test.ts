@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import search from '../src/runtime/methods/search'
-import { ISearchQuery } from '../src/runtime/types/search'
+import search from '../../src/runtime/methods/search'
+import { ISearchQuery } from '../../src/runtime/types/search'
 
 
 const resourceUrl = 'http://localhost/api/products'

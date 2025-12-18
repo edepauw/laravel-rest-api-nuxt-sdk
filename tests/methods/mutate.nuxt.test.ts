@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import mutate from '../src/runtime/methods/mutate'
-import { IMutateRequest } from '../src/runtime/types/mutate'
+import mutate from '../../src/runtime/methods/mutate'
+import { IMutateRequest } from '../../src/runtime/types/mutate'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch as any

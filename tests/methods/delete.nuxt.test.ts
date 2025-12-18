@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import remove from '../src/runtime/methods/delete'
+import remove from '../../src/runtime/methods/delete'
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
