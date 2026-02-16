@@ -1,6 +1,7 @@
 import { useNuxtApp } from "nuxt/app";
 
 import search from "../methods/search";
+import searchAll from "../methods/searchAll";
 import mutate from "../methods/mutate";
 import details from "../methods/details";
 import actions from "../methods/actions";
@@ -11,7 +12,7 @@ import { $fetch } from 'ofetch'
 
 
 import type { IMutateRequest, IMutateResponse } from "../types/mutate";
-import type { ISearchQuery, ISearchResponse } from "../types/search";
+import type { ISearchQuery, ISearchResponse, ISearchAllResponse } from "../types/search";
 import type { IActionRequest, IActionResponse } from "../types/actions";
 import type { IResourcePreset } from "../types/resourceConfig";
 import type { FetchOptions } from "../types/fetchOptions";
@@ -81,6 +82,13 @@ const defineResource = <T>(resourceName: string, preset: IResourcePreset<T> = {}
 		 *   });
 		 */
 		search: (request: ISearchQuery<T> = {}): Promise<ISearchResponse<T>> => search({ ...presets.search, ...request }, api),
+
+		/**
+		 * @description Searches for all resources across all pages.
+		 * @param {ISearchQuery<T>} [request={}] The search request parameters.
+		 * @returns {Promise<ISearchAllResponse<T>>} All resources matching the search criteria aggregated from all pages.
+		 */
+		searchAll: (request: ISearchQuery<T> = {}): Promise<ISearchAllResponse<T>> => searchAll({ ...presets.search, ...request }, api),
 
 		/**
 		 * @description Mutates resources.

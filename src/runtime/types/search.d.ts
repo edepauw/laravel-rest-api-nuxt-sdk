@@ -95,9 +95,12 @@ interface ISearchResponse<T> {
   goToPage: (page: number) => Promise<ISearchResponse<T>>;
 }
 
+type ISearchAllResponse<T> = Pick<ISearchResponse<T>, 'data' | 'total' | 'meta' | 'per_page'>;
+
 export type {
   operatorType,
   ISearchQuery,
+  ISearchAllResponse,
   ISearchResponse,
   IText,
   IScopes,

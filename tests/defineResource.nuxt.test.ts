@@ -8,6 +8,9 @@ vi.mock("../src/runtime/methods/details", () => ({
 vi.mock("../src/runtime/methods/search", () => ({
 	default: vi.fn(() => Promise.resolve("search-called")),
 }));
+vi.mock("../src/runtime/methods/searchAll", () => ({
+	default: vi.fn(() => Promise.resolve("searchAll-called")),
+}));
 vi.mock("../src/runtime/methods/mutate", () => ({
 	default: vi.fn(() => Promise.resolve("mutate-called")),
 }));
@@ -51,6 +54,7 @@ describe("defineResource", () => {
 		expect(resource).toHaveProperty("mutate");
 		expect(resource).toHaveProperty("details");
 		expect(resource).toHaveProperty("search");
+		expect(resource).toHaveProperty("searchAll");
 		expect(resource).toHaveProperty("actions");
 		expect(resource).toHaveProperty("remove");
 	});
