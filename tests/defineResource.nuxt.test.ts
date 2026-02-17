@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 
-// On mock les méthodes utilisées dans defineResource
+// Mock methods used in defineResource
 vi.mock("../src/runtime/methods/details", () => ({
 	default: vi.fn(() => Promise.resolve("details-called")),
 }));
@@ -18,12 +18,19 @@ vi.mock("../src/runtime/methods/delete", () => ({
 	default: vi.fn(() => Promise.resolve("remove-called")),
 }));
 
-// Mock de $fetch.create
+// Mock $fetch.create
+let capturedCreateOptions: Record<string, any> = {};
 vi.mock("ofetch", () => ({
-	$fetch: { create: () => "api-client" },
+	$fetch: {
+		create: (options: Record<string, any>) => {
+			capturedCreateOptions = options;
+			return "api-client";
+		},
+	},
 }));
 
-// Mock de useNuxtApp
+// Mock useNuxtApp + navigateTo
+const mockNavigateTo = vi.fn();
 const mockGetGlobalFetchOptions = vi.fn(() => ({
 	baseURL: "https://api.test",
 	onRequest: undefined,
@@ -37,14 +44,16 @@ vi.mock("nuxt/app", () => ({
 			getGlobalFetchOptions: mockGetGlobalFetchOptions,
 		},
 	}),
+	navigateTo: (...args: unknown[]) => mockNavigateTo(...args),
 }));
 
-import defineResource from "../src/runtime/defineResource/index";
+import defineResource, { resetUnauthorizedState } from "../src/runtime/defineResource/index";
 
 
 describe("defineResource", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		resetUnauthorizedState();
 	});
 	it("should return all methods", () => {
 		const resource = defineResource("products")();
@@ -55,15 +64,72 @@ describe("defineResource", () => {
 		expect(resource).toHaveProperty("remove");
 	});
 
-	it("configure et appelle details correctement", async () => {
+	it("should configure and call details correctly", async () => {
 		const resource = defineResource("products")();
 		const result = await resource.details();
 		expect(result).toBe("details-called");
 	});
 
-	it("configure et appelle search correctement", async () => {
+	it("should configure and call search correctly", async () => {
 		const resource = defineResource("products")();
 		const result = await resource.search();
 		expect(result).toBe("search-called");
+	});
+
+	it("should call onUnauthorized when response status is 401", async () => {
+		const onUnauthorized = vi.fn();
+		mockGetGlobalFetchOptions.mockReturnValueOnce({
+			baseURL: "https://api.test",
+			onUnauthorized,
+		});
+
+		defineResource("products")();
+
+		await capturedCreateOptions.onResponseError({ response: { status: 401 } });
+
+		expect(onUnauthorized).toHaveBeenCalledOnce();
+	});
+
+	it("should call navigateTo when onUnauthorized is a string and response status is 401", async () => {
+		mockGetGlobalFetchOptions.mockReturnValueOnce({
+			baseURL: "https://api.test",
+			onUnauthorized: "/logout",
+		});
+
+		defineResource("products")();
+
+		await capturedCreateOptions.onResponseError({ response: { status: 401 } });
+
+		expect(mockNavigateTo).toHaveBeenCalledWith("/logout");
+	});
+
+	it("should not call onUnauthorized when response status is not 401", async () => {
+		const onUnauthorized = vi.fn();
+		mockGetGlobalFetchOptions.mockReturnValueOnce({
+			baseURL: "https://api.test",
+			onUnauthorized,
+		});
+
+		defineResource("products")();
+
+		await capturedCreateOptions.onResponseError({ response: { status: 403 } });
+
+		expect(onUnauthorized).not.toHaveBeenCalled();
+	});
+
+	it("should call onUnauthorized only once on multiple 401 responses", async () => {
+		const onUnauthorized = vi.fn();
+		mockGetGlobalFetchOptions.mockReturnValueOnce({
+			baseURL: "https://api.test",
+			onUnauthorized,
+		});
+
+		defineResource("products")();
+
+		await capturedCreateOptions.onResponseError({ response: { status: 401 } });
+		await capturedCreateOptions.onResponseError({ response: { status: 401 } });
+		await capturedCreateOptions.onResponseError({ response: { status: 401 } });
+
+		expect(onUnauthorized).toHaveBeenCalledOnce();
 	});
 });

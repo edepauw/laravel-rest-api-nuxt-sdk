@@ -23,6 +23,7 @@ interface FetchOptions<R extends ResponseType = ResponseType, T = any> extends O
 	 * Only supported older Node.js versions using node-fetch-native polyfill.
 	 */
 	agent?: unknown;
+	onUnauthorized?: string | (() => void);
 	/** timeout in milliseconds */
 	timeout?: number;
 	retry?: number | false;

@@ -1,4 +1,4 @@
-import { useNuxtApp } from "nuxt/app";
+import { navigateTo, useNuxtApp } from "nuxt/app";
 
 import search from "../methods/search";
 import mutate from "../methods/mutate";
@@ -23,6 +23,12 @@ const combineHooks = (globalHook, specificHook) => {
 		if (typeof specificHook === "function") await specificHook(arg);
 	};
 }
+
+let isUnauthorizedHandled = false;
+
+export const resetUnauthorizedState = (): void => {
+	isUnauthorizedHandled = false;
+};
 
 
 const joinUrl = (base: string, path: string) =>
@@ -53,14 +59,26 @@ const defineResource = <T>(resourceName: string, preset: IResourcePreset<T> = {}
 
 	const resourceUrl = joinUrl(globalFetchOptions?.baseURL ?? "", `/${resourceName}`);
 
+	const { onUnauthorized, ...fetchOptionsWithoutUnauthorized } = globalFetchOptions ?? {};
+
+	const onResponseErrorWithUnauthorized = onUnauthorized
+		? combineHooks(({ response }) => {
+			if (response?.status === 401 && !isUnauthorizedHandled) {
+				isUnauthorizedHandled = true;
+				if (typeof onUnauthorized === 'function') onUnauthorized();
+				else navigateTo(onUnauthorized);
+			}
+		}, globalFetchOptions?.onResponseError)
+		: globalFetchOptions?.onResponseError;
+
 	// @ts-ignore
 	const api = $fetch.create({
-		...globalFetchOptions,
+		...fetchOptionsWithoutUnauthorized,
 		baseURL: resourceUrl,
 		onRequest: combineHooks(globalFetchOptions?.onRequest, presets.onRequest),
 		onRequestError: combineHooks(globalFetchOptions?.onRequestError, presets.onRequestError),
 		onResponse: combineHooks(globalFetchOptions?.onResponse, presets.onResponse),
-		onResponseError: combineHooks(globalFetchOptions?.onResponseError, presets.onResponseError),
+		onResponseError: combineHooks(onResponseErrorWithUnauthorized, presets.onResponseError),
 	})
 
 
