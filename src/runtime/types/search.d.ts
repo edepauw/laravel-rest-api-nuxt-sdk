@@ -15,36 +15,6 @@ interface ISearchQuery<T> {
   limit?: number;
 }
 
-interface ISearchResponse<T> {
-  current_page: number;
-  data: T[];
-  from: number;
-  last_page: number;
-  per_page: number;
-  to: number;
-  total: number;
-  meta: any;
-  total_pages: number;
-  nextPage: () => Promise<ISearchResponse<T>>;
-  previousPage: () => Promise<ISearchResponse<T>>;
-  goToPage: (page: number) => Promise<ISearchResponse<T>>;
-}
-
-interface ISearchResponse<T> {
-  current_page: number;
-  data: T[];
-  from: number;
-  last_page: number;
-  per_page: number;
-  to: number;
-  total: number;
-  meta: any;
-  total_pages: number;
-  nextPage: () => Promise<ISearchResponse<T>>;
-  previousPage: () => Promise<ISearchResponse<T>>;
-  goToPage: (page: number) => Promise<ISearchResponse<T>>;
-}
-
 interface IText {
   value: string;
   trashed?: "with" | "only" | "omitted"
@@ -125,13 +95,16 @@ interface ISearchResponse<T> {
   goToPage: (page: number) => Promise<ISearchResponse<T>>;
 }
 
-type ISearchAllResponse<T> = Pick<ISearchResponse<T>, 'data' | 'total' | 'meta' | 'per_page'>;
+type ISearchAllResponse<T> = Pick<ISearchResponse<T>, "data" | "total" | "meta" | "per_page">;
+
+type ISearchAllQuery<T> = Omit<ISearchQuery<T>, "page" | "limit">;
 
 export type {
   operatorType,
   ISearchQuery,
-  ISearchAllResponse,
+  ISearchAllQuery,
   ISearchResponse,
+  ISearchAllResponse,
   IText,
   IScopes,
   IFilter,
@@ -143,5 +116,3 @@ export type {
   IPagination,
   IGate,
 };
-
-
