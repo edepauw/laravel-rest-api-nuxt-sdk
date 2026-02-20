@@ -1,18 +1,18 @@
-import type { ISearchQuery, ISearchAllResponse } from "../types/search";
+import type { ISearchAllQuery, ISearchAllResponse, ISearchResponse } from "../types/search";
 import search from "./search";
 
 const searchAll = async <T>(
-    searchQuery: ISearchQuery<T> = {},
+    searchQuery: ISearchAllQuery<T> = {},
     api: any
 ): Promise<ISearchAllResponse<T>> => {
     const allData: T[] = [];
     let currentPage = 1;
     let lastPage = 1;
-    let firstPageResponse: any = null;
+    let firstPageResponse: ISearchResponse<T> | null = null;
 
     do {
         const response = await search<T>({ ...searchQuery, page: currentPage }, api);
-        
+
         if (currentPage === 1) {
             firstPageResponse = response;
             lastPage = response.last_page;
@@ -22,12 +22,12 @@ const searchAll = async <T>(
         currentPage++;
     } while (currentPage <= lastPage);
 
-    return {
-        data: allData,
-        total: firstPageResponse?.total ?? 0,
-        meta: firstPageResponse?.meta ?? {},
-        per_page: allData.length,
-    };
+   return {
+    data: allData,
+    total: firstPageResponse?.total ?? 0,
+    meta: firstPageResponse?.meta ?? {},
+    per_page: firstPageResponse?.per_page ?? allData.length,
+};
 };
 
 export default searchAll;
