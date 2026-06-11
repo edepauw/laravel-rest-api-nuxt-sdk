@@ -2,7 +2,7 @@ import { ISearchQuery } from "./search";
 
 interface IActionField {
 	name: string;
-	value: string | number | boolean | null;
+	value: any
 }
 
 interface IActionRequest<T> {
